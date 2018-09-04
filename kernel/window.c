@@ -1,3 +1,4 @@
+
 #include <kernel.h>
 
 #define SCREEN_BASEADDR 0xB8000
@@ -13,6 +14,7 @@ void poke_screen(int x, int y, WORD ch) {
 WORD peek_screen(int x, int y) {
 	return peek_w(SCREEN_BASEADDR + y * SCREEN_WIDTH * 2 + x * 2);
 }
+
 
 void scroll_window(WINDOW* wnd) {
 	// move upward from line 1 ~ (height - 1)
@@ -35,7 +37,6 @@ void scroll_window(WINDOW* wnd) {
 }
 
 
-
 void move_cursor(WINDOW* wnd, int x, int y) {
 	if (x >= 0 && x < wnd->width && y >= 0 && y < wnd->height) {
 		wnd->cursor_x = x;
@@ -44,17 +45,14 @@ void move_cursor(WINDOW* wnd, int x, int y) {
 }
 
 
-
 void remove_cursor(WINDOW* wnd) {
 	poke_screen(wnd->x + wnd->cursor_x, wnd->y + wnd->cursor_y, ' ');
 }
 
 
-
 void show_cursor(WINDOW* wnd) {
 	poke_screen(wnd->x + wnd->cursor_x, wnd->y + wnd->cursor_y, wnd->cursor_char | default_color);
 }
-
 
 
 void clear_window(WINDOW* wnd) {
@@ -69,6 +67,13 @@ void clear_window(WINDOW* wnd) {
 	show_cursor(wnd);
 }
 
+
+void output_string(WINDOW* wnd, const char *str) {
+	while (*str != '\0') {
+		output_char(wnd, *str);
+		str++;
+	}
+}
 
 
 void output_char(WINDOW* wnd, unsigned char c) {
@@ -107,16 +112,6 @@ void output_char(WINDOW* wnd, unsigned char c) {
 }
 
 
-
-void output_string(WINDOW* wnd, const char *str) {
-	while (*str != '\0') {
-		output_char(wnd, *str);
-		str++;
-	}
-}
-
-
-
 /* 
  * There is not need to make any changes to the code below,
  * however, you are encouraged to at least look at it!
@@ -137,9 +132,8 @@ char* printnum(char *b, unsigned int u, int base, BOOL negflag, int length, BOOL
         u /= base;
     } while (u != 0);
 
-    if (negflag) {
+    if (negflag)
         *b++ = '-';
-	}
 
     size = &buf[MAXBUF - 1] - p;
 
@@ -150,9 +144,8 @@ char* printnum(char *b, unsigned int u, int base, BOOL negflag, int length, BOOL
         }
     }
 
-    while (++p != &buf[MAXBUF]) {
+    while (++p != &buf[MAXBUF])
         *b++ = *p;
-	}
 
     if (size < length) {
         /* must be ladjust */
@@ -161,7 +154,6 @@ char* printnum(char *b, unsigned int u, int base, BOOL negflag, int length, BOOL
             length--;
         }
     }
-
     return b;
 }
 
@@ -199,17 +191,17 @@ char* printnum(char *b, unsigned int u, int base, BOOL negflag, int length, BOOL
 
 
 int vsprintf(char *buf, const char *fmt, va_list argp) {
-    char           *p;
-    char           *p2;
-    int             length;
-    int             prec;
-    int             ladjust;
-    char            padc;
-    int             n;
-    unsigned int    u;
-    int             negflag;
-    char            c;
-    char           *start_buf = buf;
+    char* p;
+    char* p2;
+    int length;
+    int prec;
+    int ladjust;
+    char padc;
+    int n;
+    unsigned int u;
+    int negflag;
+    char c;
+    char* start_buf = buf;
 
     while (*fmt != '\0') {
         if (*fmt != '%') {
@@ -351,7 +343,6 @@ int vsprintf(char *buf, const char *fmt, va_list argp) {
 }
 
 
-
 void wprintf(WINDOW * wnd, const char *fmt, ...) {
     va_list argp;
     char buf[160];
@@ -361,7 +352,6 @@ void wprintf(WINDOW * wnd, const char *fmt, ...) {
     output_string(wnd, buf);
     va_end(argp);
 }
-
 
 
 static WINDOW kernel_window_def = { 0, 0, 80, 25, 0, 0, ' ' };
